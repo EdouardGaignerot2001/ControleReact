@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import thorImage from '../assets/thor.jpg';
 import { Movie } from '../types/movies';
 import { fetchMovies } from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [movies, setMovies] = useState<Movie[]>([]);
-
+    const navigate = useNavigate();
+    
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
@@ -16,6 +18,10 @@ const Home: React.FC = () => {
         console.log('Recherche:', searchTerm);
     };
 
+    const handleMovieClick = (movie: Movie) => {
+        navigate(`/description/${movie.id}`, { state: movie }); 
+      };
+    
 
     useEffect(() => {
         fetchMovies("/movie/popular").then((data) => {
@@ -89,7 +95,7 @@ const Home: React.FC = () => {
                 }}>
                     {movies.length > 0 ? (
                         movies.map((movie) => (
-                            <div key={movie.id} style={styles.movieCard}>
+                            <div key={movie.id} style={styles.movieCard}  onClick={() => handleMovieClick(movie)}>
                                 {/* Image du film */}
                                 <img
                                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}

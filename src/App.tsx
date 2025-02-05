@@ -6,6 +6,7 @@ import Series from "./page/seies";
 import Films from "./page/films";
 import Populaires from "./page/populaires";
 import NavbarFin from "./page/navbarFin";
+import FilmDescription from "./page/description";
 
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         <Route path="/series" element={<Series />} />
         <Route path="/films" element={<Films />} />
         <Route path="/populaires" element={<Populaires />} />
+        <Route path="/description/:id" element={< FilmDescription />} />
       </Routes>
       <NavbarFin />
     </Router>
