@@ -8,7 +8,8 @@ const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [movies, setMovies] = useState<Movie[]>([]);
     const navigate = useNavigate();
-    
+    const [bannerImage, setBannerImage] = useState<string>('');
+
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
@@ -19,18 +20,22 @@ const Home: React.FC = () => {
     };
 
     const handleMovieClick = (movie: Movie) => {
-        navigate(`/description/${movie.id}`, { state: movie }); 
-      };
-    
+        navigate(`/description/${movie.id}`, { state: movie });
+    };
+
 
     useEffect(() => {
         fetchMovies("/movie/popular").then((data) => {
             if (data) {
-                console.log('Données récupérées :', data); // Afficher les données récupérées
-                setMovies(data); // Mettre à jour l'état avec les films récupérés
+                console.log('Données récupérées :', data);
+                setMovies(data);
+                if (data.length > 0) {
+
+                    setBannerImage(`https://image.tmdb.org/t/p/w500${data[0].poster_path}`);
+                }
             }
         }).catch((error) => {
-            console.error('Erreur lors de la récupération des films :', error); // Gérer les erreurs d'API
+            console.error('Erreur lors de la récupération des films :', error);
         });
     }, []);
 
@@ -42,8 +47,8 @@ const Home: React.FC = () => {
         }}>
             {/* Image en haut */}
             <img
-                src={thorImage}
-                alt="Thor"
+                src={bannerImage || 'https://via.placeholder.com/1920x300?text=Loading...'}
+                alt="Film banner"
                 style={{
                     width: '100%',
                     height: '300px',
@@ -95,7 +100,7 @@ const Home: React.FC = () => {
                 }}>
                     {movies.length > 0 ? (
                         movies.map((movie) => (
-                            <div key={movie.id} style={styles.movieCard}  onClick={() => handleMovieClick(movie)}>
+                            <div key={movie.id} style={styles.movieCard} onClick={() => handleMovieClick(movie)}>
                                 {/* Image du film */}
                                 <img
                                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
