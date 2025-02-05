@@ -9,7 +9,8 @@ const Home: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const navigate = useNavigate();
     const [bannerImage, setBannerImage] = useState<string>('');
-
+    const [filteredMovies, setFilteredMovies] = useState<Movie[]>([]);
+    
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
@@ -29,6 +30,7 @@ const Home: React.FC = () => {
             if (data) {
                 console.log('Données récupérées :', data);
                 setMovies(data);
+                setFilteredMovies(data);
                 if (data.length > 0) {
 
                     setBannerImage(`https://image.tmdb.org/t/p/w500${data[0].poster_path}`);
@@ -38,6 +40,19 @@ const Home: React.FC = () => {
             console.error('Erreur lors de la récupération des films :', error);
         });
     }, []);
+
+
+    useEffect(() => {
+        if (searchTerm === '') {
+            setFilteredMovies(movies); // Si la recherche est vide, montrer tous les films
+        } else {
+            setFilteredMovies(
+                movies.filter(movie =>
+                    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+            );
+        }
+    }, [searchTerm, movies]);
 
 
     return (
@@ -98,8 +113,8 @@ const Home: React.FC = () => {
                     gap: '20px',
 
                 }}>
-                    {movies.length > 0 ? (
-                        movies.map((movie) => (
+                    {filteredMovies.length > 0 ? (
+                        filteredMovies.map((movie) => (
                             <div key={movie.id} style={styles.movieCard} onClick={() => handleMovieClick(movie)}>
                                 {/* Image du film */}
                                 <img
