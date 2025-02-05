@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import thorImage from '../assets/thor.jpg'; // Assurez-vous d'importer correctement l'image
+import React, { useEffect, useState } from 'react';
+import thorImage from '../assets/thor.jpg';
+import { Movie } from '../types/movies';
+import { fetchMovies } from '../api/api';
 
 const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [movies, setMovies] = useState<Movie[]>([]);
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -10,13 +13,25 @@ const Home: React.FC = () => {
 
     const handleSearchSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        // Vous pouvez ajouter la logique de recherche ici (par exemple, rediriger ou afficher les résultats)
         console.log('Recherche:', searchTerm);
     };
 
+
+    useEffect(() => {
+        fetchMovies("/movie/popular").then((data) => {
+            if (data) {
+                console.log('Données récupérées :', data); // Afficher les données récupérées
+                setMovies(data); // Mettre à jour l'état avec les films récupérés
+            }
+        }).catch((error) => {
+            console.error('Erreur lors de la récupération des films :', error); // Gérer les erreurs d'API
+        });
+    }, []);
+
+
     return (
         <div style={{
-            textAlign: 'center' as 'center', // Forcer le type 'center' pour textAlign
+            textAlign: 'center' as 'center',
             padding: '20px'
         }}>
             {/* Image en haut */}
@@ -34,19 +49,13 @@ const Home: React.FC = () => {
                     top: '60px',
                 }}
             />
-
-            {/* Zone de recherche */}
             <div style={{
-                position: 'absolute', // Positionner la zone de recherche par-dessus l'image
-                top: '200px', // Placer la zone de recherche verticalement au milieu de l'image
-                left: '50%', // Placer la zone de recherche horizontalement au centre
-                transform: 'translate(-50%, -50%)', // Centrer parfaitement la zone de recherche
-                zIndex: 1, // Assurer que la zone de recherche est au-dessus de l'image
+                position: 'absolute',
+                top: '200px',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                zIndex: 1,
                 width: '100%'
-
-
-
-
             }}>
                 <form onSubmit={handleSearchSubmit}>
                     <input
@@ -58,14 +67,60 @@ const Home: React.FC = () => {
                     />
                 </form>
             </div>
+            <div>
+                {/* Liste des films */}
+                <div
+                    style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: '20px',
+                        marginTop: '500px',
+                    }}>
+                    <h1>Tendance</h1>
+                </div>
+
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: '20px',
+
+                }}>
+                    {movies.length > 0 ? (
+                        movies.map((movie) => (
+                            <div key={movie.id} style={styles.movieCard}>
+                                {/* Image du film */}
+                                <img
+                                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                                    alt={movie.title}
+                                    style={{
+                                        width: '100%',
+                                        height: '300px',
+                                        objectFit: 'cover',
+                                    }}
+                                />
+                                <h2 style={{
+                                    fontSize: '18px',
+                                    fontWeight: 'bold',
+                                    marginTop: '10px',
+                                    textAlign: 'center',
+                                }}>{movie.title}</h2>
+                            </div>
+                        ))
+                    ) : (
+                        <p>Aucun film trouvé.</p>
+                    )}
+                </div>
+            </div>
         </div>
+
     );
 };
 
-// Styles pour la page Home
 const styles = {
     container: {
-        textAlign: 'center' as 'center', // Forcer le type 'center' pour textAlign
+        textAlign: 'center' as 'center',
         padding: '20px',
 
     },
@@ -88,6 +143,25 @@ const styles = {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer',
+    },
+
+
+    movieCard: {
+        width: '200px',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+        backgroundColor: '#fff',
+        transition: 'transform 0.3s',
+    },
+    movieCardHover: {
+        transform: 'scale(1.05)',
+    },
+    movieDescription: {
+        fontSize: '14px',
+        padding: '10px',
+        color: '#555',
+        textAlign: 'center',
     },
 };
 
